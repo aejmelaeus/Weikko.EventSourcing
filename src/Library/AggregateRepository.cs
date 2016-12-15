@@ -3,18 +3,18 @@ using Library.Interfaces;
 
 namespace Library
 {
-    public class AggregateRepository<TEvent, TAggregate> where TEvent : class, new() where TAggregate : AggregateBase<TEvent>, new()
+    public class AggregateRepository<TEventBase, TAggregate> 
+        where TEventBase : class, new() 
+        where TAggregate : AggregateBase<TEventBase>, new()
     {
-        private readonly IEventSource<TEvent> _eventSource;
-        private readonly IEventDispatcher<TEvent> _eventDispatcher;
+        private readonly IEventSource<TEventBase> _eventSource;
 
-        public AggregateRepository(IEventSource<TEvent> eventSource, IEventDispatcher<TEvent> eventDispatcher)
+        public AggregateRepository(IEventSource<TEventBase> eventSource)
         {
             _eventSource = eventSource;
-            _eventDispatcher = eventDispatcher;
         }
 
-        public AggregateBase<TEvent> Read(string aggregateId)
+        public AggregateBase<TEventBase> Read(string aggregateId)
         {
             var aggreagate = new TAggregate();
 
@@ -28,12 +28,22 @@ namespace Library
             return aggreagate;
         }
 
-        public void Commit(AggregateBase<TEvent> aggregate)
+        public void Commit(AggregateBase<TEventBase> aggregate)
         {
             using (var transactionScope = new TransactionScope())
             {
-                _eventDispatcher.Dispatch(aggregate.UncommitedEvents);
+                var projectionBuilders = ProjectionBuilders.ListProjectionBuilders<TEventBase>();
+
+                foreach (var projectionBuilder in projectionBuilders)
+                {
+                    foreach (var uncommitedEvent in aggregate.UncommitedEvents)
+                    {
+                        // projectionBuilder.Handle(uncommitedEvent);
+                    }
+                }
+
                 _eventSource.Commit(aggregate.UncommitedEvents);
+
                 transactionScope.Complete();
             }
         }

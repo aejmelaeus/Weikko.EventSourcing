@@ -31,7 +31,7 @@ namespace Tests
                 Category = category
             });
 
-            var view = projectionRepository.Read(id);
+            var view = projectionRepository.Read<CompanyView>(id);
             
             // Assert
             Assert.That(view.Id, Is.EqualTo(id));
@@ -65,7 +65,7 @@ namespace Tests
                 NewCategory = theNewCategory
             });
 
-            var view = projectionRepository.Read(id);
+            var view = projectionRepository.Read<CompanyView>(id);
 
             Assert.That(view.Id, Is.EqualTo(id));
             Assert.That(view.Name, Is.EqualTo(existingName));
@@ -108,7 +108,7 @@ namespace Tests
 
             // Act
             projectionBuilder.Rebuild(id);
-            var view = projectionRepository.Read(id);
+            var view = projectionRepository.Read<CompanyView>(id);
 
             // Assert
             Assert.That(view.Id, Is.EqualTo(id));

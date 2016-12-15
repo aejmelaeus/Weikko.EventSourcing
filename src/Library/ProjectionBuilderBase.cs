@@ -5,12 +5,11 @@ using System.Collections.Generic;
 namespace Library
 {
     public abstract class ProjectionBuilderBase<TEventBase, TView> : 
-        IProjectionBuilder<TEventBase>, 
-        IHandleMessageSync<TEventBase> 
+        IProjectionBuilder<TEventBase>
             where TEventBase : class 
             where TView : class, new()
     {
-        private readonly IProjectionRepository<TView> _repository;
+        private readonly IProjectionRepository _repository;
         private readonly IEventSource<TEventBase> _eventSource;
 
         private readonly Dictionary<Type, Handler<TEventBase, TView>> _routes = new Dictionary<Type, Handler<TEventBase, TView>>(); 
@@ -20,7 +19,7 @@ namespace Library
             _routes.Add(typeof(TEvent), new Handler<TEventBase, TView>((e, v) => update(e as TEvent, v), e => id(e as TEvent)));
         }
 
-        protected ProjectionBuilderBase(IProjectionRepository<TView> repository, IEventSource<TEventBase> eventSource)
+        protected ProjectionBuilderBase(IProjectionRepository repository, IEventSource<TEventBase> eventSource)
         {
             _repository = repository;
             _eventSource = eventSource;
@@ -32,7 +31,7 @@ namespace Library
             if (!_routes.ContainsKey(eventType)) return;
 
             var id = _routes[eventType].Id(@event);
-            var view = _repository.Read(id) ?? new TView();
+            var view = _repository.Read<TView>(id) ?? new TView();
 
             view = Handle(@event, view);
 

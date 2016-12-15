@@ -6,7 +6,8 @@ namespace Example
 {
     public class CompanyProjectionBuilder : ProjectionBuilderBase<EventBase, CompanyView>
     {
-        public CompanyProjectionBuilder(IProjectionRepository<CompanyView> repository, IEventSource<EventBase> eventSource) : 
+        // TODO - these should not be ctor params...
+        public CompanyProjectionBuilder(IProjectionRepository repository, IEventSource<EventBase> eventSource) : 
             base(repository, eventSource)
         {
             RegisterHandler<CompanyCreated>(Handle, e => e.Id);

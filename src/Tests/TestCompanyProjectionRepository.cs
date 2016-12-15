@@ -4,11 +4,11 @@ using Library.Interfaces;
 
 namespace Tests
 {
-    internal class TestCompanyProjectionRepository : IProjectionRepository<CompanyView>
+    internal class TestCompanyProjectionRepository : IProjectionRepository
     {
-        private readonly Dictionary<string, CompanyView> _views = new Dictionary<string, CompanyView>();
+        private readonly Dictionary<string, object> _views = new Dictionary<string, object>();
          
-        public void Commit(string id, CompanyView view)
+        public void Commit<TView>(string id, TView view) where TView : class
         {
             if (_views.ContainsKey(id))
             {
@@ -20,11 +20,11 @@ namespace Tests
             }
         }
 
-        public CompanyView Read(string id)
+        public TView Read<TView>(string id) where TView : class
         {
             if (_views.ContainsKey(id))
             {
-                return _views[id];
+                return _views[id] as TView;
             }
 
             return null;
