@@ -40,8 +40,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="EventBase.cs" />
-    <Compile Include="SomeProjectionBuilder.cs" />
+    <Compile Include="CompanyView.cs" />
+    <Compile Include="Events\CompanyCategoryUpdated.cs" />
+    <Compile Include="Events\CompanyCreated.cs" />
+    <Compile Include="Events\CompanyNameUpdated.cs" />
+    <Compile Include="Events\EventBase.cs" />
+    <Compile Include="CompanyProjectionBuilder.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -1,4 +1,4 @@
-﻿namespace Example
+﻿namespace Example.Events
 {
     public class EventBase
     {

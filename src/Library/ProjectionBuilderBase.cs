@@ -1,28 +1,42 @@
 ﻿using System;
-using System.Collections.Generic;
 using Library.Interfaces;
+using System.Collections.Generic;
 
 namespace Library
 {
-    public abstract class ProjectionBuilderBase<TEvent, TView> : 
-        IProjectionBuilder<TEvent>, 
-        IHandleMessageSync<TEvent> 
-            where TEvent : class where TView : new()
+    public abstract class ProjectionBuilderBase<TEventBase, TView> : 
+        IProjectionBuilder<TEventBase>, 
+        IHandleMessageSync<TEventBase> 
+            where TEventBase : class 
+            where TView : class, new()
     {
-        private readonly IProjectionRepository _repository;
-        private readonly IEventSource<TEvent> _eventSource;
+        private readonly IProjectionRepository<TView> _repository;
+        private readonly IEventSource<TEventBase> _eventSource;
 
-        private readonly Dictionary<Type, Func<TEvent, TView, string>> _routes = new Dictionary<Type, Func<TEvent, TView, string>>();
+        private readonly Dictionary<Type, Handler<TEventBase, TView>> _routes = new Dictionary<Type, Handler<TEventBase, TView>>(); 
 
-        internal void RegisterTransition(Func<TEvent, TView, string> transition)
+        protected void RegisterHandler<TEvent>(Func<TEvent, TView, TView> update, Func<TEvent, string> id) where TEvent : class
         {
-            _routes.Add(typeof(TEvent), transition);
+            _routes.Add(typeof(TEvent), new Handler<TEventBase, TView>((e, v) => update(e as TEvent, v), e => id(e as TEvent)));
         }
 
-        protected ProjectionBuilderBase(IProjectionRepository repository, IEventSource<TEvent> eventSource)
+        protected ProjectionBuilderBase(IProjectionRepository<TView> repository, IEventSource<TEventBase> eventSource)
         {
             _repository = repository;
             _eventSource = eventSource;
+        }
+
+        public void Handle(TEventBase @event)
+        {
+            var eventType = @event.GetType();
+            if (!_routes.ContainsKey(eventType)) return;
+
+            var id = _routes[eventType].Id(@event);
+            var view = _repository.Read(id) ?? new TView();
+
+            view = Handle(@event, view);
+
+            _repository.Commit(id, view);
         }
 
         public void Rebuild(string id)
@@ -32,25 +46,20 @@ namespace Library
 
             foreach (var @event in events)
             {
-                ApplyEvent(@event, view);
+                var eventType = @event.GetType();
+                if (_routes.ContainsKey(eventType))
+                {
+                    view = Handle(@event, view);
+                }
             }
 
-            _repository.Commit(view);
+            _repository.Commit(id, view);
         }
 
-        private void ApplyEvent(TEvent @event, TView view)
+        private TView Handle(TEventBase @event, TView view)
         {
             var eventType = @event.GetType();
-            if (_routes.ContainsKey(eventType))
-            {
-                _routes[eventType](@event, view);
-            }
-        }
-
-        public void Handle(TEvent message)
-        {
-            // TODO - figure out what to do here!
-            // var view = _repository.Read<TView>()
+            return _routes[eventType].Handle(@event, view);
         }
     }
 }

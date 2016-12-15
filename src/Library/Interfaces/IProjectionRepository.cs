@@ -1,8 +1,8 @@
 ﻿namespace Library.Interfaces
 {
-    public interface IProjectionRepository
+    public interface IProjectionRepository<TView> where TView : class 
     {
-        void Commit<TView>(TView view);
-        TView Read<TView>(string id);
+        void Commit(string id, TView view);
+        TView Read(string id);
     }
 }
