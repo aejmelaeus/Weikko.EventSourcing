@@ -12,6 +12,9 @@ namespace Library
 
             bldr.RegisterGeneric(typeof(ProjectionBuilderBase<,>))
                 .As(typeof(IProjectionBuilder<TEventBase>));
+
+            bldr.RegisterType<Projections<TEventBase>>()
+                .As<IProjections<TEventBase>>();
         }
     }
 }
