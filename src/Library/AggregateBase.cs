@@ -5,6 +5,8 @@ namespace Library
 {
     public abstract class AggregateBase<TEvent> where TEvent : class
     {
+        // TODO: Figure out this one...
+        public string Id { get; }
         internal List<TEvent> UncommitedEvents { get; set; } = new List<TEvent>();
         private readonly Dictionary<Type, Action<TEvent>> _routes = new Dictionary<Type, Action<TEvent>>();
 

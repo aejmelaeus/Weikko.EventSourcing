@@ -14,22 +14,26 @@ namespace Tests
         public void Handle_WhenHandlingCompanyCreatedEvent_UpdateCalledOnRepository()
         {
             // Arrange
-            var eventStore = Substitute.For<IEventSource<EventBase>>();
             var projectionRepository = new TestCompanyProjectionRepository();
 
-            var projectionBuilder = new CompanyProjectionBuilder(projectionRepository, eventStore);
+            var projectionBuilder = new CompanyProjectionBuilder(projectionRepository);
 
             const string id = "SomeId";
             const string name = "SomeName";
             const string category = "SomeCategory";
 
-            // Act
-            projectionBuilder.Handle(new CompanyCreated
+            List<EventBase> events = new List<EventBase>
             {
-                Name = name,
-                Id = id,
-                Category = category
-            });
+                new CompanyCreated
+                {
+                    Name = name,
+                    Id = id,
+                    Category = category
+                }
+            };
+
+            // Act
+            projectionBuilder.Handle(id, events);
 
             var view = projectionRepository.Read<CompanyView>(id);
             
@@ -46,7 +50,6 @@ namespace Tests
             const string existingName = "SomeName";
             const string theNewCategory = "TheNewCategory";
 
-            var eventStore = Substitute.For<IEventSource<EventBase>>();
             var projectionRepository = new TestCompanyProjectionRepository();
 
             projectionRepository.WithExistingView(id, new CompanyView
@@ -56,14 +59,19 @@ namespace Tests
                 Category = "SomeCategory"
             });
 
-            var projectionBuilder = new CompanyProjectionBuilder(projectionRepository, eventStore);
+            var projectionBuilder = new CompanyProjectionBuilder(projectionRepository);
+
+            var events = new List<EventBase>
+            {
+                new CompanyCategoryUpdated
+                {
+                    Id = id,
+                    NewCategory = theNewCategory
+                }
+            };
 
             // Act
-            projectionBuilder.Handle(new CompanyCategoryUpdated
-            {
-                Id = id,
-                NewCategory = theNewCategory
-            });
+            projectionBuilder.Handle(id, events);
 
             var view = projectionRepository.Read<CompanyView>(id);
 
@@ -99,15 +107,12 @@ namespace Tests
                 }
             };
 
-            var eventStore = Substitute.For<IEventSource<EventBase>>();
             var projectionRepository = new TestCompanyProjectionRepository();
 
-            var projectionBuilder = new CompanyProjectionBuilder(projectionRepository, eventStore);
-
-            eventStore.Stream(id).Returns(events);
+            var projectionBuilder = new CompanyProjectionBuilder(projectionRepository);
 
             // Act
-            projectionBuilder.Rebuild(id);
+            projectionBuilder.Rebuild(id, events);
             var view = projectionRepository.Read<CompanyView>(id);
 
             // Assert

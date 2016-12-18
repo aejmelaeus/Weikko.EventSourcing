@@ -1,17 +1,19 @@
-﻿using System.Transactions;
-using Library.Interfaces;
+﻿using Library.Interfaces;
+using System.Transactions;
 
 namespace Library
 {
-    public class AggregateRepository<TEventBase, TAggregate> 
+    public class Aggregates<TEventBase, TAggregate> 
         where TEventBase : class, new() 
         where TAggregate : AggregateBase<TEventBase>, new()
     {
         private readonly IEventSource<TEventBase> _eventSource;
+        private readonly IProjections<TEventBase> _projections;
 
-        public AggregateRepository(IEventSource<TEventBase> eventSource)
+        public Aggregates(IEventSource<TEventBase> eventSource, IProjections<TEventBase> projections)
         {
             _eventSource = eventSource;
+            _projections = projections;
         }
 
         public AggregateBase<TEventBase> Read(string aggregateId)
@@ -32,15 +34,7 @@ namespace Library
         {
             using (var transactionScope = new TransactionScope())
             {
-                var projectionBuilders = ProjectionBuilders.ListProjectionBuilders<TEventBase>();
-
-                foreach (var projectionBuilder in projectionBuilders)
-                {
-                    foreach (var uncommitedEvent in aggregate.UncommitedEvents)
-                    {
-                        // projectionBuilder.Handle(uncommitedEvent);
-                    }
-                }
+                _projections.Update(aggregate.Id, aggregate.UncommitedEvents);
 
                 _eventSource.Commit(aggregate.UncommitedEvents);
 

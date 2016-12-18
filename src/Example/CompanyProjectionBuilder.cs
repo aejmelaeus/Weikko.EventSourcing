@@ -7,12 +7,12 @@ namespace Example
     public class CompanyProjectionBuilder : ProjectionBuilderBase<EventBase, CompanyView>
     {
         // TODO - these should not be ctor params...
-        public CompanyProjectionBuilder(IProjectionRepository repository, IEventSource<EventBase> eventSource) : 
-            base(repository, eventSource)
+        public CompanyProjectionBuilder(IProjectionRepository repository) : 
+            base(repository)
         {
-            RegisterHandler<CompanyCreated>(Handle, e => e.Id);
-            RegisterHandler<CompanyNameUpdated>(Handle, e => e.Id);
-            RegisterHandler<CompanyCategoryUpdated>(Handle, e => e.Id);
+            RegisterHandler<CompanyCreated>(Handle);
+            RegisterHandler<CompanyNameUpdated>(Handle);
+            RegisterHandler<CompanyCategoryUpdated>(Handle);
         }
 
         private CompanyView Handle(CompanyCategoryUpdated e, CompanyView view)
