@@ -1,29 +1,29 @@
 ﻿using System;
+using Library.Interfaces;
 using System.Collections.Generic;
 
 namespace Library
 {
-    public abstract class AggregateBase<TEvent> where TEvent : class
+    public abstract class AggregateBase<TEventBase> : IAggregate<TEventBase> where TEventBase : class
     {
-        // TODO: Figure out this one...
-        public string Id { get; }
-        internal List<TEvent> UncommitedEvents { get; set; } = new List<TEvent>();
-        private readonly Dictionary<Type, Action<TEvent>> _routes = new Dictionary<Type, Action<TEvent>>();
+        public abstract string Id { get; }
+        private readonly List<TEventBase> _uncommittedEvents = new List<TEventBase>();
+        private readonly Dictionary<Type, Action<TEventBase>> _routes = new Dictionary<Type, Action<TEventBase>>();
 
-        internal void RegisterTransition<T>(Action<TEvent> transition)
+        protected void RegisterTransition<T>(Action<T> transition) where T : class
         {
-            _routes.Add(typeof(T), transition);
+            _routes.Add(typeof(T), e => transition(e as T));
         }
         
-        internal void RaiseEvent(TEvent @event)
+        protected void RaiseEvent(TEventBase @event)
         {
             if (ApplyEvent(@event))
             {
-                UncommitedEvents.Add(@event);
+                _uncommittedEvents.Add(@event);
             }
         }
 
-        internal bool ApplyEvent(TEvent @event)
+        public bool ApplyEvent(TEventBase @event)
         {
             var eventType = @event.GetType();
             if (_routes.ContainsKey(eventType))
@@ -32,6 +32,13 @@ namespace Library
                 return true;
             }
             return false;
+        }
+
+        public IEnumerable<TEventBase> UncommittedEvents => _uncommittedEvents;
+
+        public void ClearUncommitedEvents()
+        {
+            _uncommittedEvents.Clear();
         }
     }
 }

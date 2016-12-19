@@ -34,9 +34,9 @@ namespace Library
         {
             using (var transactionScope = new TransactionScope())
             {
-                _projections.Update(aggregate.Id, aggregate.UncommitedEvents);
+                _projections.Update(aggregate.Id, aggregate.UncommittedEvents);
 
-                _eventSource.Commit(aggregate.UncommitedEvents);
+                _eventSource.Commit(aggregate.UncommittedEvents);
 
                 transactionScope.Complete();
             }

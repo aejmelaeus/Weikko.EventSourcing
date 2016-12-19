@@ -1,8 +1,8 @@
 ﻿using System;
-using System.Data.SqlClient;
 using Example;
 using Library;
 using NUnit.Framework;
+using System.Data.SqlClient;
 
 namespace Tests.Integration
 {

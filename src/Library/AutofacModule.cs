@@ -1,5 +1,9 @@
-﻿using Autofac;
+﻿using System;
+using System.Linq;
+using System.Reflection;
+using Autofac;
 using Library.Interfaces;
+using Module = Autofac.Module;
 
 namespace Library
 {
@@ -10,11 +14,14 @@ namespace Library
             bldr.RegisterType<SqlServerProjectionRepository>()
                 .As<IProjectionRepository>();
 
-            bldr.RegisterGeneric(typeof(ProjectionBuilderBase<,>))
-                .As(typeof(IProjectionBuilder<TEventBase>));
-
             bldr.RegisterType<Projections<TEventBase>>()
                 .As<IProjections<TEventBase>>();
+
+            var asseblies = AppDomain.CurrentDomain.GetAssemblies();
+
+            bldr.RegisterAssemblyTypes(asseblies)
+                .Where(a => a.GetInterfaces().Any(i => i.IsAssignableFrom(typeof (IProjectionBuilder<TEventBase>))))
+                .AsImplementedInterfaces();
         }
     }
 }

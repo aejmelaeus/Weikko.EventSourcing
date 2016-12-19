@@ -40,6 +40,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Commands\CreateCompany.cs" />
+    <Compile Include="CompanyAggregate.cs" />
     <Compile Include="CompanyView.cs" />
     <Compile Include="Events\CompanyCategoryUpdated.cs" />
     <Compile Include="Events\CompanyCreated.cs" />
