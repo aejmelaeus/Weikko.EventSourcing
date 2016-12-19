@@ -16,7 +16,7 @@ namespace Tests.Integration
         {
             // Arrange
             var tableName = Guid.NewGuid().ToString();
-            var projectionRepository = new SqlServerProjectionRepository(ConnectionString, tableName);
+            var projectionRepository = new SqlServerViewRepository(ConnectionString, tableName);
 
             // Act
             projectionRepository.CreateProjectionsTable();
@@ -50,7 +50,7 @@ namespace Tests.Integration
                 Name = name
             };
 
-            var projectionRepository = new SqlServerProjectionRepository(ConnectionString, tableName);
+            var projectionRepository = new SqlServerViewRepository(ConnectionString, tableName);
             projectionRepository.CreateProjectionsTable();
 
             // Act
@@ -80,7 +80,7 @@ namespace Tests.Integration
                 Category = "ACategory"
             };
 
-            var projectionRepository = new SqlServerProjectionRepository(ConnectionString, tableName);
+            var projectionRepository = new SqlServerViewRepository(ConnectionString, tableName);
             projectionRepository.CreateProjectionsTable();
 
             projectionRepository.Commit(id, companyView);

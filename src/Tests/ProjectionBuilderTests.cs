@@ -13,11 +13,11 @@ namespace Tests
         public void Handle_WhenHandlingCompanyCreatedEvent_UpdateCalledOnRepository()
         {
             // Arrange
-            var projectionRepository = new TestCompanyProjectionRepository();
+            var projectionRepository = new TestCompanyViewRepository();
 
             var projectionBuilder = new CompanyProjectionBuilder
             {
-                ProjectionRepository = projectionRepository
+                ViewRepository = projectionRepository
             };
 
             const string id = "SomeId";
@@ -52,7 +52,7 @@ namespace Tests
             const string existingName = "SomeName";
             const string theNewCategory = "TheNewCategory";
 
-            var projectionRepository = new TestCompanyProjectionRepository();
+            var projectionRepository = new TestCompanyViewRepository();
 
             projectionRepository.WithExistingView(id, new CompanyView
             {
@@ -63,7 +63,7 @@ namespace Tests
 
             var projectionBuilder = new CompanyProjectionBuilder
             {
-                ProjectionRepository = projectionRepository
+                ViewRepository = projectionRepository
             };
 
             var events = new List<EventBase>
@@ -112,11 +112,11 @@ namespace Tests
                 }
             };
 
-            var projectionRepository = new TestCompanyProjectionRepository();
+            var projectionRepository = new TestCompanyViewRepository();
 
             var projectionBuilder = new CompanyProjectionBuilder
             {
-                ProjectionRepository = projectionRepository
+                ViewRepository = projectionRepository
             };
 
             // Act
@@ -144,11 +144,11 @@ namespace Tests
                 }
             };
 
-            var projectionRepository = new TestCompanyProjectionRepository();
+            var projectionRepository = new TestCompanyViewRepository();
 
             var projectionBuilder = new CompanyNamesProjectionBuilder
             {
-                ProjectionRepository = projectionRepository
+                ViewRepository = projectionRepository
             };
 
             // Act

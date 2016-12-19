@@ -1,8 +1,11 @@
-﻿namespace Library.Interfaces
+﻿using System.Collections.Generic;
+
+namespace Library.Interfaces
 {
-    public interface IProjectionRepository 
+    public interface IProjectionRepository<in TEventBase>
     {
-        void Commit<TView>(string id, TView view) where TView : class;
         TView Read<TView>(string id) where TView : class;
+        void Rebuild<TView>(string id);
+        void Update(string id, IEnumerable<TEventBase> events);
     }
 }

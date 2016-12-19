@@ -5,23 +5,23 @@ using System.Collections.Generic;
 
 namespace Library
 {
-    internal class Projections<TEventBase> : IProjections<TEventBase> where TEventBase : class
+    internal class ProjectionRepository<TEventBase> : IProjectionRepository<TEventBase> where TEventBase : class
     {
-        private readonly IProjectionRepository _projectionRepository;
+        private readonly IViewRepository _viewRepository;
         private readonly IEventSource<TEventBase> _eventSource;
         private readonly Dictionary<Type, IProjectionBuilder<TEventBase>> _projectionBuilders;
 
-        public Projections(IEnumerable<IProjectionBuilder<TEventBase>> projectionBuilders, 
-            IProjectionRepository projectionRepository, IEventSource<TEventBase> eventSource)
+        public ProjectionRepository(IEnumerable<IProjectionBuilder<TEventBase>> projectionBuilders, 
+            IViewRepository viewRepository, IEventSource<TEventBase> eventSource)
         {
-            _projectionRepository = projectionRepository;
+            _viewRepository = viewRepository;
             _eventSource = eventSource;
             _projectionBuilders = projectionBuilders.ToDictionary(pb => pb.ViewType);
         }
 
         public TView Read<TView>(string id) where TView : class
         {
-            return _projectionRepository.Read<TView>(id);
+            return _viewRepository.Read<TView>(id);
         }
 
         public void Rebuild<TView>(string id)

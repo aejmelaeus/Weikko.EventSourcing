@@ -51,15 +51,15 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AggregateBase.cs" />
-    <Compile Include="Aggregates.cs" />
+    <Compile Include="AggregateRepository.cs" />
     <Compile Include="AutofacModule.cs" />
     <Compile Include="Interfaces\IAggregate.cs" />
-    <Compile Include="Interfaces\IAggregates.cs" />
+    <Compile Include="Interfaces\IAggregateRepository.cs" />
     <Compile Include="Interfaces\IEventSource.cs" />
-    <Compile Include="Interfaces\IProjections.cs" />
-    <Compile Include="Interfaces\IProjectionBuilder.cs" />
     <Compile Include="Interfaces\IProjectionRepository.cs" />
-    <Compile Include="Projections.cs" />
+    <Compile Include="Interfaces\IProjectionBuilder.cs" />
+    <Compile Include="Interfaces\IViewRepository.cs" />
+    <Compile Include="ProjectionRepository.cs" />
     <Compile Include="ProjectionBuilderBase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SqlProjectionRepository.cs" />

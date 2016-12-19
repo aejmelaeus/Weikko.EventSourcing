@@ -3,15 +3,15 @@ using System.Transactions;
 
 namespace Library
 {
-    public class Aggregates<TEventBase> : IAggregates<TEventBase> where TEventBase : class, new()
+    public class AggregateRepository<TEventBase> : IAggregateRepository<TEventBase> where TEventBase : class, new()
     {
         private readonly IEventSource<TEventBase> _eventSource;
-        private readonly IProjections<TEventBase> _projections;
+        private readonly IProjectionRepository<TEventBase> _projectionRepository;
 
-        public Aggregates(IEventSource<TEventBase> eventSource, IProjections<TEventBase> projections)
+        public AggregateRepository(IEventSource<TEventBase> eventSource, IProjectionRepository<TEventBase> projectionRepository)
         {
             _eventSource = eventSource;
-            _projections = projections;
+            _projectionRepository = projectionRepository;
         }
 
         public TAggregate Read<TAggregate>(string id) where TAggregate : IAggregate<TEventBase>, new()
@@ -30,14 +30,14 @@ namespace Library
         
         public void Commit(IAggregate<TEventBase> aggregate)
         {
-            //using (var transactionScope = new TransactionScope())
-            //{
+            using (var transactionScope = new TransactionScope())
+            {
                 _eventSource.Commit(aggregate.Id, aggregate.UncommittedEvents);
 
-                _projections.Update(aggregate.Id, aggregate.UncommittedEvents);
-                
-            //    transactionScope.Complete();
-            //}
+                _projectionRepository.Update(aggregate.Id, aggregate.UncommittedEvents);
+
+                transactionScope.Complete();
+            }
         }
     }
 }

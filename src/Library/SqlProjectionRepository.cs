@@ -5,23 +5,23 @@ using System.Data.SqlClient;
 
 namespace Library
 {
-    public class SqlServerProjectionRepository : IProjectionRepository
+    public class SqlServerViewRepository : IViewRepository
     {
         private readonly string _connectionString;
         private readonly string _tableName;
         private readonly string _pkName;
 
-        public SqlServerProjectionRepository(string connectionString, string tableName)
+        public SqlServerViewRepository(string connectionString, string tableName)
         {
             _connectionString = connectionString;
             _tableName = tableName;
             _pkName = tableName.Replace("-", string.Empty);
         }
 
-        public SqlServerProjectionRepository()
+        public SqlServerViewRepository()
         {
-            _connectionString = ConfigurationManager.ConnectionStrings["Projections"].ConnectionString;
-            _tableName = "Projections";
+            _connectionString = ConfigurationManager.ConnectionStrings["ProjectionRepository"].ConnectionString;
+            _tableName = "ProjectionRepository";
             _pkName = "IdType";
         }
 

@@ -4,7 +4,7 @@ using Library.Interfaces;
 
 namespace Tests
 {
-    internal class TestCompanyProjectionRepository : IProjectionRepository
+    internal class TestCompanyViewRepository : IViewRepository
     {
         private readonly Dictionary<string, object> _views = new Dictionary<string, object>();
          

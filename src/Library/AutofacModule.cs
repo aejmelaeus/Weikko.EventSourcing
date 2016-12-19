@@ -11,14 +11,14 @@ namespace Library
     {
         protected override void Load(ContainerBuilder bldr)
         {
-            bldr.RegisterType<SqlServerProjectionRepository>()
-                .As<IProjectionRepository>();
+            bldr.RegisterType<SqlServerViewRepository>()
+                .As<IViewRepository>();
 
-            bldr.RegisterType<Projections<TEventBase>>()
-                .As<IProjections<TEventBase>>();
+            bldr.RegisterType<ProjectionRepository<TEventBase>>()
+                .As<IProjectionRepository<TEventBase>>();
 
-            bldr.RegisterType<Aggregates<TEventBase>>()
-                .As<IAggregates<TEventBase>>();
+            bldr.RegisterType<AggregateRepository<TEventBase>>()
+                .As<IAggregateRepository<TEventBase>>();
 
             var asseblies = AppDomain.CurrentDomain.GetAssemblies();
 

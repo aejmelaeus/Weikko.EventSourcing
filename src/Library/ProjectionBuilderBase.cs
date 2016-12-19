@@ -10,7 +10,7 @@ namespace Library
             where TEventBase : class 
             where TView : class, new()
     {
-        public IProjectionRepository ProjectionRepository { get; set; }
+        public IViewRepository ViewRepository { get; set; }
 
         public Type ViewType => typeof(TView);
 
@@ -28,11 +28,11 @@ namespace Library
 
             if (!AnyEventsToHandle(materializedEvents)) return;
 
-            var view = ProjectionRepository.Read<TView>(id) ?? new TView();
+            var view = ViewRepository.Read<TView>(id) ?? new TView();
 
             view = Handle(materializedEvents, view);
 
-            ProjectionRepository.Commit(id, view);
+            ViewRepository.Commit(id, view);
         }
 
         public void Rebuild(string id, IEnumerable<TEventBase> events)
@@ -41,7 +41,7 @@ namespace Library
 
             view = Handle(events, view);
 
-            ProjectionRepository.Commit(id, view);
+            ViewRepository.Commit(id, view);
         }
 
         private TView Handle(IEnumerable<TEventBase> events, TView view)

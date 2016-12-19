@@ -15,7 +15,7 @@ namespace Example.Api
         protected void Application_Start()
         {
             // TODO - figure out how this is fixed in a smooth manner... :)
-            var projectionRepository = new SqlServerProjectionRepository();
+            var projectionRepository = new SqlServerViewRepository();
             projectionRepository.CreateProjectionsTable();
 
             GlobalConfiguration.Configure(WebApiConfig.Register);

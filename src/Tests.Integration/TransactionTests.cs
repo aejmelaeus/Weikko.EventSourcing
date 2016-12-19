@@ -46,7 +46,7 @@ namespace Tests.Integration
             // Arrange
             string id = Guid.NewGuid().ToString();
 
-            var aggregates = _container.Resolve<IAggregates<TransactionEventBase>>();
+            var aggregates = _container.Resolve<IAggregateRepository<TransactionEventBase>>();
 
             var transaction = new TransactionAggregate();
             transaction.CreateTransaction(id);
