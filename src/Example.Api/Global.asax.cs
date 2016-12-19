@@ -34,7 +34,7 @@ namespace Example.Api
             bldr.RegisterInstance(GetEventSource())
                 .As<IStoreEvents>();
 
-            bldr.RegisterType<EventSource>()
+            bldr.RegisterType<EventSource<EventBase>>()
                 .As<IEventSource<EventBase>>();
 
             var container = bldr.Build();

@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Linq;
 using NEventStore;
-using Example.Events;
 using Library.Interfaces;
 using System.Collections.Generic;
 
 namespace Example
 {
-    public class EventSource : IEventSource<EventBase>
+    public class EventSource<TEventBase> : IEventSource<TEventBase> where TEventBase : class
     {
         private readonly IStoreEvents _store;
 
@@ -16,15 +15,15 @@ namespace Example
             _store = store;
         }
 
-        public IEnumerable<EventBase> Stream(string id)
+        public IEnumerable<TEventBase> Stream(string id)
         {
             using (var stream = _store.OpenStream(id))
             {
-                return stream.CommittedEvents.Select(s => s.Body as EventBase);
+                return stream.CommittedEvents.Select(s => s.Body as TEventBase);
             }
         }
 
-        public void Commit(string id, IEnumerable<EventBase> events)
+        public void Commit(string id, IEnumerable<TEventBase> events)
         {
             using (var stream = _store.OpenStream(id))
             {
@@ -37,7 +36,7 @@ namespace Example
             }
         }
 
-        public void Commit(string id, EventBase @event, long sequenceAnchor, Guid commitId)
+        public void Commit(string id, TEventBase @event, long sequenceAnchor, Guid commitId)
         {
             throw new NotImplementedException();
         }

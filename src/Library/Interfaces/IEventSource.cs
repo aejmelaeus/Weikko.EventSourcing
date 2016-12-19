@@ -3,10 +3,10 @@ using System.Collections.Generic;
 
 namespace Library.Interfaces
 {
-    public interface IEventSource<TEvent> where TEvent : class
+    public interface IEventSource<TEventBase> where TEventBase : class
     {
-        IEnumerable<TEvent> Stream(string id);
-        void Commit(string id, IEnumerable<TEvent> events);
-        void Commit(string id, TEvent @event, long sequenceAnchor, Guid commitId);
+        IEnumerable<TEventBase> Stream(string id);
+        void Commit(string id, IEnumerable<TEventBase> events);
+        void Commit(string id, TEventBase @event, long sequenceAnchor, Guid commitId);
     }
 }

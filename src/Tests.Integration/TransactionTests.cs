@@ -16,6 +16,24 @@ namespace Tests.Integration
     {
         private IContainer _container;
 
+        [OneTimeSetUp]
+        public void OneTimeSetUp()
+        {
+            var bldr = new ContainerBuilder();
+            
+            var module = new AutofacModule<TransactionEventBase>();
+
+            bldr.RegisterType<EventSource<TransactionEventBase>>()
+                .As<IEventSource<TransactionEventBase>>();
+
+            bldr.RegisterInstance(GetEventSource())
+                .As<IStoreEvents>();
+
+            bldr.RegisterModule(module);
+
+            _container = bldr.Build();
+        }
+
         /*
         ** Some TODOs:
         ** - Merge the Sequenced Aggregate into here...
@@ -25,42 +43,25 @@ namespace Tests.Integration
         [Test]
         public void Commit_WhenThereIsAProjectionBuilderThatCrashes_WriteToEventStreamNotCommitted()
         {
-            // Shiiiet...
-
             // Arrange
-            //string id = Guid.NewGuid().ToString();
-            
-            //var transaction = new TransactionAggregate();
-            //transaction.CreateTransaction(id);
+            string id = Guid.NewGuid().ToString();
 
-            //var projectionRepository = new SqlServerProjectionRepository();
-            //var projectionBuilder = new TransactionProjectionBuilder
-            //{
-            //    ProjectionRepository = projectionRepository
-            //};
+            var aggregates = _container.Resolve<IAggregates<TransactionEventBase>>();
 
-            //var projectionBuilders = new List<IProjectionBuilder<TransactionEventBase>>
-            //{
-            //    projectionBuilder
-            //};
+            var transaction = new TransactionAggregate();
+            transaction.CreateTransaction(id);
 
-            //var storeEvents = GetEventSource();
-            //var eventSource = new EventSource(storeEvents);
-
-            //var aggregates = new Aggregates<TransactionEventBase>(eventSource, );
-
-
-            //try
-            //{
-            //    // Act
-            //    aggregates.Commit(transaction);
-            //}
-            //catch (Exception)
-            //{
-            //    // Assert
-            //    var transactionFromDb = aggregates.Read<TransactionAggregate>(id);
-            //    Assert.That(string.IsNullOrEmpty(transactionFromDb.Id));
-            //}
+            try
+            {
+                // Act
+                aggregates.Commit(transaction);
+            }
+            catch (Exception)
+            {
+                // Assert
+                var transactionFromDb = aggregates.Read<TransactionAggregate>(id);
+                Assert.That(string.IsNullOrEmpty(transactionFromDb.Id));
+            }
         }
 
         private IStoreEvents GetEventSource()
