@@ -1,9 +1,8 @@
 ﻿using Example;
-using NSubstitute;
 using Example.Events;
 using NUnit.Framework;
-using Library.Interfaces;
 using System.Collections.Generic;
+using System.Xml;
 
 namespace Tests
 {
@@ -16,7 +15,10 @@ namespace Tests
             // Arrange
             var projectionRepository = new TestCompanyProjectionRepository();
 
-            var projectionBuilder = new CompanyProjectionBuilder(projectionRepository);
+            var projectionBuilder = new CompanyProjectionBuilder
+            {
+                ProjectionRepository = projectionRepository
+            };
 
             const string id = "SomeId";
             const string name = "SomeName";
@@ -59,7 +61,10 @@ namespace Tests
                 Category = "SomeCategory"
             });
 
-            var projectionBuilder = new CompanyProjectionBuilder(projectionRepository);
+            var projectionBuilder = new CompanyProjectionBuilder
+            {
+                ProjectionRepository = projectionRepository
+            };
 
             var events = new List<EventBase>
             {
@@ -109,7 +114,10 @@ namespace Tests
 
             var projectionRepository = new TestCompanyProjectionRepository();
 
-            var projectionBuilder = new CompanyProjectionBuilder(projectionRepository);
+            var projectionBuilder = new CompanyProjectionBuilder
+            {
+                ProjectionRepository = projectionRepository
+            };
 
             // Act
             projectionBuilder.Rebuild(id, events);
@@ -119,6 +127,37 @@ namespace Tests
             Assert.That(view.Id, Is.EqualTo(id));
             Assert.That(view.Name, Is.EqualTo(theNewName));
             Assert.That(view.Category, Is.EqualTo(theNewCategory));
+        }
+
+        [Test]
+        public void Handle_WhenProjectionDoesNotContainAnyOfTheEvents_CommitNotCalled()
+        {
+            // Arrange
+            const string id = "SomeId";
+
+            var events = new List<EventBase>
+            {
+                new CompanyCategoryUpdated
+                {
+                    Id = id,
+                    NewCategory = "TheNewCategory"
+                }
+            };
+
+            var projectionRepository = new TestCompanyProjectionRepository();
+
+            var projectionBuilder = new CompanyNamesProjectionBuilder
+            {
+                ProjectionRepository = projectionRepository
+            };
+
+            // Act
+            projectionBuilder.Handle(id, events);
+
+            var view = projectionRepository.Read<CompanyNamesView>(id);
+
+            // Assert
+            Assert.That(view, Is.Null);
         }
     }
 }

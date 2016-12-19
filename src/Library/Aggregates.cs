@@ -3,9 +3,7 @@ using System.Transactions;
 
 namespace Library
 {
-    public class Aggregates<TEventBase, TAggregate> 
-        where TEventBase : class, new() 
-        where TAggregate : AggregateBase<TEventBase>, new()
+    public class Aggregates<TEventBase> : IAggregates<TEventBase> where TEventBase : class, new()
     {
         private readonly IEventSource<TEventBase> _eventSource;
         private readonly IProjections<TEventBase> _projections;
@@ -16,11 +14,11 @@ namespace Library
             _projections = projections;
         }
 
-        public AggregateBase<TEventBase> Read(string aggregateId)
+        public TAggregate Read<TAggregate>(string id) where TAggregate : IAggregate<TEventBase>, new()
         {
             var aggreagate = new TAggregate();
 
-            var events = _eventSource.Stream(aggregateId);
+            var events = _eventSource.Stream(id);
 
             foreach (var @event in events)
             {
@@ -29,17 +27,17 @@ namespace Library
 
             return aggreagate;
         }
-
-        public void Commit(AggregateBase<TEventBase> aggregate)
+        
+        public void Commit(IAggregate<TEventBase> aggregate)
         {
-            using (var transactionScope = new TransactionScope())
-            {
+            //using (var transactionScope = new TransactionScope())
+            //{
+                _eventSource.Commit(aggregate.Id, aggregate.UncommittedEvents);
+
                 _projections.Update(aggregate.Id, aggregate.UncommittedEvents);
-
-                _eventSource.Commit(aggregate.UncommittedEvents);
-
-                transactionScope.Complete();
-            }
+                
+            //    transactionScope.Complete();
+            //}
         }
     }
 }

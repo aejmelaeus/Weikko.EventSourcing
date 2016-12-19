@@ -16,7 +16,7 @@ namespace Library
         {
             _projectionRepository = projectionRepository;
             _eventSource = eventSource;
-            _projectionBuilders = projectionBuilders.ToDictionary(pb => pb.EventBaseType);
+            _projectionBuilders = projectionBuilders.ToDictionary(pb => pb.ViewType);
         }
 
         public TView Read<TView>(string id) where TView : class

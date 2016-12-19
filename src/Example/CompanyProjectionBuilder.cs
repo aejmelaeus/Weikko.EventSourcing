@@ -1,14 +1,11 @@
 ﻿using Library;
 using Example.Events;
-using Library.Interfaces;
 
 namespace Example
 {
     public class CompanyProjectionBuilder : ProjectionBuilderBase<EventBase, CompanyView>
     {
-        // TODO - these should not be ctor params...
-        public CompanyProjectionBuilder(IProjectionRepository repository) : 
-            base(repository)
+        public CompanyProjectionBuilder()
         {
             RegisterHandler<CompanyCreated>(Handle);
             RegisterHandler<CompanyNameUpdated>(Handle);

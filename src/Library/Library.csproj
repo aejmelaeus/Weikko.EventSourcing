@@ -53,7 +53,8 @@
     <Compile Include="AggregateBase.cs" />
     <Compile Include="Aggregates.cs" />
     <Compile Include="AutofacModule.cs" />
-    <Compile Include="Configuration.cs" />
+    <Compile Include="Interfaces\IAggregate.cs" />
+    <Compile Include="Interfaces\IAggregates.cs" />
     <Compile Include="Interfaces\IEventSource.cs" />
     <Compile Include="Interfaces\IProjections.cs" />
     <Compile Include="Interfaces\IProjectionBuilder.cs" />

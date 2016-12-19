@@ -1,7 +1,7 @@
 ﻿using System;
+using System.Linq;
 using Library.Interfaces;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Library
 {
@@ -10,59 +10,61 @@ namespace Library
             where TEventBase : class 
             where TView : class, new()
     {
-        private readonly IProjectionRepository _repository;
+        public IProjectionRepository ProjectionRepository { get; set; }
 
-        private readonly Dictionary<Type, Func<TEventBase, TView, TView>> _routes = new Dictionary<Type, Func<TEventBase, TView, TView>>(); 
+        public Type ViewType => typeof(TView);
+
+        private readonly Dictionary<Type, Func<TEventBase, TView, TView>> _routes = new Dictionary<Type, Func<TEventBase, TView, TView>>();
 
         protected void RegisterHandler<TEvent>(Func<TEvent, TView, TView> update) where TEvent : class
         {
             _routes.Add(typeof(TEvent), (e, v) => update(e as TEvent, v));
         }
 
-        protected ProjectionBuilderBase(IProjectionRepository repository)
-        {
-            _repository = repository;
-        }
-
         public void Handle(string id, IEnumerable<TEventBase> events)
         {
-            var view = _repository.Read<TView>(id) ?? new TView();
+            // TODO - Hmmm..
+            var materializedEvents = events?.ToList() ?? new List<TEventBase>();
 
-            foreach (var @event in events)
-            {
-                var eventType = @event.GetType();
+            if (!AnyEventsToHandle(materializedEvents)) return;
 
-                if (_routes.ContainsKey(eventType))
-                {
-                    view = Handle(@event, view);
-                }
-            }
+            var view = ProjectionRepository.Read<TView>(id) ?? new TView();
 
-            _repository.Commit(id, view);
+            view = Handle(materializedEvents, view);
+
+            ProjectionRepository.Commit(id, view);
         }
-
-        public Type EventBaseType => typeof(TEventBase);
 
         public void Rebuild(string id, IEnumerable<TEventBase> events)
         {
             var view = new TView();
 
+            view = Handle(events, view);
+
+            ProjectionRepository.Commit(id, view);
+        }
+
+        private TView Handle(IEnumerable<TEventBase> events, TView view)
+        {
             foreach (var @event in events)
             {
                 var eventType = @event.GetType();
+
                 if (_routes.ContainsKey(eventType))
                 {
-                    view = Handle(@event, view);
+                    view = _routes[eventType](@event, view);
                 }
             }
 
-            _repository.Commit(id, view);
+            return view;
         }
 
-        private TView Handle(TEventBase @event, TView view)
+        private bool AnyEventsToHandle(List<TEventBase> materializedEvents)
         {
-            var eventType = @event.GetType();
-            return _routes[eventType](@event, view);
+            var handlerTypes = _routes.Keys;
+            var eventTypes = materializedEvents.Select(e => e.GetType());
+
+            return handlerTypes.Intersect(eventTypes).Any();
         }
     }
 }
