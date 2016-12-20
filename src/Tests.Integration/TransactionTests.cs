@@ -1,13 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using Autofac;
 using Example;
-using Example.Events;
 using Library;
-using Library.Interfaces;
 using NEventStore;
-using NEventStore.Persistence.Sql.SqlDialects;
 using NUnit.Framework;
+using Library.Interfaces;
+using NEventStore.Persistence.Sql.SqlDialects;
 
 namespace Tests.Integration
 {
@@ -20,14 +18,11 @@ namespace Tests.Integration
         public void OneTimeSetUp()
         {
             var bldr = new ContainerBuilder();
-            
-            var module = new AutofacModule<TransactionEventBase>();
 
+            var module = SequencedAggregateConfiguration.Configure<TransactionEventBase>();
+            
             bldr.RegisterType<EventSource<TransactionEventBase>>()
                 .As<IEventSource<TransactionEventBase>>();
-
-            bldr.RegisterInstance(GetEventSource())
-                .As<IStoreEvents>();
 
             bldr.RegisterModule(module);
 
@@ -62,19 +57,6 @@ namespace Tests.Integration
                 var transactionFromDb = aggregates.Read<TransactionAggregate>(id);
                 Assert.That(string.IsNullOrEmpty(transactionFromDb.Id));
             }
-        }
-
-        private IStoreEvents GetEventSource()
-        {
-            return Wireup
-                .Init()
-                .UsingSqlPersistence("EventSource")
-                .WithDialect(new MsSqlDialect())
-                .EnlistInAmbientTransaction()
-                .InitializeStorageEngine()
-                .UsingJsonSerialization()
-                .Compress()
-                .Build();
         }
     }
 

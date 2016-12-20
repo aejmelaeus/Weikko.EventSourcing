@@ -23,7 +23,8 @@ namespace Example.Api
             var bldr = new ContainerBuilder();
 
             // TODO: Figure out the name for this one...
-            var module = new AutofacModule<EventBase>();
+            
+            var module = SequencedAggregateConfiguration.Configure<EventBase>();
 
             bldr.RegisterModule(module);
 
